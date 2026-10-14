@@ -1,5 +1,6 @@
 <title>Outlet Performance</title>
 <meta name="claude:viewport-fit-sides" content="cover">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;1,9..40,400&display=swap">
 
@@ -324,25 +325,20 @@ body {
 
 <script>
 // ═══════════════════════════════════════════════════════════════
-//  DATA LAYER — swap loadData() for a Supabase call later.
-//  Supabase example:
-//    const { data } = await supabase
-//      .from('outlet_performance')
-//      .select('outlet, week, sales, target, orders, returns');
-//    return data;
+//  DATA LAYER — Supabase
 // ═══════════════════════════════════════════════════════════════
+const SUPABASE_URL = 'https://kdmybtgfjhkgyqvpmqpr.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_hGVyFGpcE_RGVGuxTeFLIg_gtjKVA0k';
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 async function loadData() {
-  return [
-    { outlet: 'Tampines', week: '2026-09-07', sales: 18400, target: 18000, orders: 612, returns: 9 },
-    { outlet: 'Tampines', week: '2026-09-14', sales: 16100, target: 18000, orders: 540, returns: 14 },
-    { outlet: 'Tampines', week: '2026-09-21', sales: 19200, target: 18000, orders: 640, returns: 8 },
-    { outlet: 'Jurong',   week: '2026-09-07', sales: 14200, target: 15000, orders: 488, returns: 11 },
-    { outlet: 'Jurong',   week: '2026-09-14', sales: 12600, target: 15000, orders: 430, returns: 19 },
-    { outlet: 'Jurong',   week: '2026-09-21', sales: 15300, target: 15000, orders: 512, returns: 10 },
-    { outlet: 'Orchard',  week: '2026-09-07', sales: 22500, target: 24000, orders: 690, returns: 12 },
-    { outlet: 'Orchard',  week: '2026-09-14', sales: 20100, target: 24000, orders: 612, returns: 21 },
-    { outlet: 'Orchard',  week: '2026-09-21', sales: 24800, target: 24000, orders: 742, returns: 9 },
-  ];
+  const { data, error } = await db
+    .from('outlet_performance')
+    .select('outlet, week, sales, target, orders, returns')
+    .order('outlet')
+    .order('week');
+  if (error) throw error;
+  return data;
 }
 
 // ─── State ──────────────────────────────────────────────────────
