@@ -1,0 +1,553 @@
+<title>Outlet Performance</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;1,9..40,400&display=swap">
+
+<style>
+/* ── Token system: muted warm neutrals + orange accent ── */
+:root {
+  --bg:           #F5F4F2;
+  --surface:      #FFFFFF;
+  --surface-2:    #EEECEA;
+  --border:       #E0DDD8;
+  --border-2:     #CBC8C2;
+  --text:         #1A1917;
+  --text-2:       #6B6760;
+  --text-3:       #9E9A94;
+  --accent:       #E9671B;
+  --accent-bg:    #FEF0E7;
+  --danger:       #C63E3E;
+  --danger-bg:    #FCEAEA;
+  --ok:           #3A8A5A;
+  --ok-bg:        #E8F5EE;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:           #18171A;
+    --surface:      #222128;
+    --surface-2:    #2B2A32;
+    --border:       #38363F;
+    --border-2:     #504E58;
+    --text:         #EEEAE4;
+    --text-2:       #9A9690;
+    --text-3:       #6B6760;
+    --accent:       #F07535;
+    --accent-bg:    #2A180A;
+    --danger:       #D95050;
+    --danger-bg:    #2A1010;
+    --ok:           #4DAA6E;
+    --ok-bg:        #0D2418;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg:           #18171A;
+  --surface:      #222128;
+  --surface-2:    #2B2A32;
+  --border:       #38363F;
+  --border-2:     #504E58;
+  --text:         #EEEAE4;
+  --text-2:       #9A9690;
+  --text-3:       #6B6760;
+  --accent:       #F07535;
+  --accent-bg:    #2A180A;
+  --danger:       #D95050;
+  --danger-bg:    #2A1010;
+  --ok:           #4DAA6E;
+  --ok-bg:        #0D2418;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding-left: max(20px, env(safe-area-inset-left, 0px));
+  padding-right: max(20px, env(safe-area-inset-right, 0px));
+  padding-block: 0 40px;
+}
+
+/* ── Header ── */
+.header {
+  padding-block: 24px 20px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 24px;
+}
+
+.header-copy h1 {
+  font-family: 'Outfit', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.header-copy p {
+  font-size: 12px;
+  color: var(--text-3);
+  letter-spacing: 0.01em;
+}
+
+/* ── Filter ── */
+.filter {
+  display: flex;
+  gap: 4px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 3px;
+  flex-shrink: 0;
+}
+
+.filter-btn {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 13px;
+  border: none;
+  background: transparent;
+  color: var(--text-2);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.14s, color 0.14s, box-shadow 0.14s;
+  white-space: nowrap;
+}
+.filter-btn:hover { color: var(--text); }
+.filter-btn.active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.09);
+}
+
+/* ── KPI row ── */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+@media (max-width: 680px) {
+  .kpi-row { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 380px) {
+  .kpi-row { grid-template-columns: 1fr 1fr; gap: 8px; }
+}
+
+.kpi-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 18px 14px;
+}
+.kpi-label {
+  font-size: 10.5px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-3);
+  margin-bottom: 8px;
+}
+.kpi-value {
+  font-family: 'Outfit', sans-serif;
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 5px;
+  color: var(--text);
+}
+.kpi-value.ok     { color: var(--ok); }
+.kpi-value.warn   { color: var(--accent); }
+.kpi-value.danger { color: var(--danger); }
+.kpi-sub {
+  font-size: 11.5px;
+  color: var(--text-3);
+}
+
+/* ── Sections ── */
+.section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+.section-head {
+  padding: 14px 18px 12px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.section-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text);
+}
+.section-hint {
+  font-size: 11.5px;
+  color: var(--text-3);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.legend-dot {
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: 2px;
+}
+.legend-dot.danger { background: var(--danger); }
+.legend-dot.ok     { background: var(--accent); }
+
+/* ── Chart ── */
+.chart-wrap {
+  padding: 16px 18px 18px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.chart-svg-wrap {
+  min-width: 360px;
+}
+.chart-svg-wrap svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+/* ── Attention list ── */
+.attn-list {
+  list-style: none;
+}
+.attn-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 18px;
+  border-bottom: 1px solid var(--border);
+}
+.attn-item:last-child { border-bottom: none; }
+.attn-outlet {
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  min-width: 76px;
+}
+.attn-week {
+  font-size: 12px;
+  color: var(--text-2);
+  flex: 1;
+  min-width: 0;
+}
+.attn-gap {
+  font-size: 12px;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.attn-badge {
+  font-family: 'Outfit', sans-serif;
+  font-size: 12.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  background: var(--danger-bg);
+  color: var(--danger);
+  padding: 3px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.empty-state {
+  padding: 32px 18px;
+  text-align: center;
+  color: var(--text-3);
+  font-size: 13px;
+}
+</style>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-copy">
+    <h1>Outlet Performance</h1>
+    <p id="period-label">Sep 7 – Sep 21, 2026 &nbsp;·&nbsp; 3 outlets &nbsp;·&nbsp; 3 weeks</p>
+  </div>
+  <div class="filter" role="group" aria-label="Filter by outlet" id="filter-tabs">
+    <button class="filter-btn active" data-outlet="All">All</button>
+    <button class="filter-btn" data-outlet="Tampines">Tampines</button>
+    <button class="filter-btn" data-outlet="Jurong">Jurong</button>
+    <button class="filter-btn" data-outlet="Orchard">Orchard</button>
+  </div>
+</div>
+
+<!-- KPI cards -->
+<div class="kpi-row" id="kpi-row"></div>
+
+<!-- Chart -->
+<div class="section">
+  <div class="section-head">
+    <span class="section-title">Sales vs Target</span>
+    <span class="section-hint">
+      % of weekly target &nbsp;
+      <span class="legend-dot ok"></span> ≥90%
+      &nbsp;
+      <span class="legend-dot danger"></span> &lt;90%
+    </span>
+  </div>
+  <div class="chart-wrap">
+    <div class="chart-svg-wrap" id="chart-container"></div>
+  </div>
+</div>
+
+<!-- Needs attention -->
+<div class="section">
+  <div class="section-head">
+    <span class="section-title">Needs Attention</span>
+    <span class="section-hint">Sales below 90% of target</span>
+  </div>
+  <ul class="attn-list" id="attn-list"></ul>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  DATA LAYER — swap loadData() for a Supabase call later.
+//  Supabase example:
+//    const { data } = await supabase
+//      .from('outlet_performance')
+//      .select('outlet, week, sales, target, orders, returns');
+//    return data;
+// ═══════════════════════════════════════════════════════════════
+async function loadData() {
+  return [
+    { outlet: 'Tampines', week: '2026-09-07', sales: 18400, target: 18000, orders: 612, returns: 9 },
+    { outlet: 'Tampines', week: '2026-09-14', sales: 16100, target: 18000, orders: 540, returns: 14 },
+    { outlet: 'Tampines', week: '2026-09-21', sales: 19200, target: 18000, orders: 640, returns: 8 },
+    { outlet: 'Jurong',   week: '2026-09-07', sales: 14200, target: 15000, orders: 488, returns: 11 },
+    { outlet: 'Jurong',   week: '2026-09-14', sales: 12600, target: 15000, orders: 430, returns: 19 },
+    { outlet: 'Jurong',   week: '2026-09-21', sales: 15300, target: 15000, orders: 512, returns: 10 },
+    { outlet: 'Orchard',  week: '2026-09-07', sales: 22500, target: 24000, orders: 690, returns: 12 },
+    { outlet: 'Orchard',  week: '2026-09-14', sales: 20100, target: 24000, orders: 612, returns: 21 },
+    { outlet: 'Orchard',  week: '2026-09-21', sales: 24800, target: 24000, orders: 742, returns: 9 },
+  ];
+}
+
+// ─── State ──────────────────────────────────────────────────────
+let ALL_DATA = [];
+let activeOutlet = 'All';
+const OUTLET_ORDER = ['Tampines', 'Jurong', 'Orchard'];
+const THRESHOLD = 90;
+
+// ─── Formatters ─────────────────────────────────────────────────
+function fmtMoney(n) {
+  if (n >= 1e6) return '$' + (n / 1e6).toFixed(2) + 'M';
+  if (n >= 1000) return '$' + (n / 1000).toFixed(1) + 'k';
+  return '$' + n.toLocaleString();
+}
+function fmtPct(n) { return n.toFixed(1) + '%'; }
+function fmtNum(n) { return n.toLocaleString(); }
+function fmtWeekShort(w) {
+  const d = new Date(w + 'T00:00:00');
+  return d.toLocaleDateString('en-SG', { month: 'short', day: 'numeric' });
+}
+
+// ─── Filter ─────────────────────────────────────────────────────
+function getFiltered() {
+  if (activeOutlet === 'All') return ALL_DATA;
+  return ALL_DATA.filter(r => r.outlet === activeOutlet);
+}
+
+// ─── KPI render ─────────────────────────────────────────────────
+function renderKPIs(data) {
+  const totSales   = data.reduce((s, r) => s + r.sales, 0);
+  const totTarget  = data.reduce((s, r) => s + r.target, 0);
+  const totOrders  = data.reduce((s, r) => s + r.orders, 0);
+  const totReturns = data.reduce((s, r) => s + r.returns, 0);
+  const pctTgt     = totTarget ? totSales / totTarget * 100 : 0;
+  const retRate    = totOrders ? totReturns / totOrders * 100 : 0;
+
+  const pctClass   = pctTgt >= 100 ? 'ok' : pctTgt >= THRESHOLD ? 'warn' : 'danger';
+  const retClass   = retRate > 3.5 ? 'danger' : retRate > 2.5 ? 'warn' : '';
+
+  document.getElementById('kpi-row').innerHTML = `
+    <div class="kpi-card">
+      <div class="kpi-label">Total Sales</div>
+      <div class="kpi-value">${fmtMoney(totSales)}</div>
+      <div class="kpi-sub">target ${fmtMoney(totTarget)}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">vs Target</div>
+      <div class="kpi-value ${pctClass}">${fmtPct(pctTgt)}</div>
+      <div class="kpi-sub">${data.length} outlet-week${data.length !== 1 ? 's' : ''}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Orders</div>
+      <div class="kpi-value">${fmtNum(totOrders)}</div>
+      <div class="kpi-sub">avg ${Math.round(totOrders / data.length)} / week</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Return Rate</div>
+      <div class="kpi-value ${retClass}">${fmtPct(retRate)}</div>
+      <div class="kpi-sub">${fmtNum(totReturns)} returns</div>
+    </div>
+  `;
+}
+
+// ─── Chart render ───────────────────────────────────────────────
+function renderChart(data) {
+  const container = document.getElementById('chart-container');
+  if (!data.length) { container.innerHTML = '<p class="empty-state">No data for selection.</p>'; return; }
+
+  // Sort by outlet order then week
+  const rows = [...data].sort((a, b) => {
+    const oi = OUTLET_ORDER.indexOf(a.outlet) - OUTLET_ORDER.indexOf(b.outlet);
+    return oi !== 0 ? oi : a.week.localeCompare(b.week);
+  });
+
+  const n = rows.length;
+  const W = 760, H = 240;
+  const pL = 48, pR = 16, pT = 28, pB = activeOutlet === 'All' ? 58 : 46;
+  const cW = W - pL - pR;
+  const cH = H - pT - pB;
+
+  // Layout: bars with group gaps
+  const outlets = [...new Set(rows.map(r => r.outlet))]; // ordered
+  const nGroups = outlets.length;
+  const intraGap = 7;
+  const interGap = nGroups > 1 ? 22 : 0;
+  const totalGaps = intraGap * (n - nGroups) + interGap * (nGroups - 1);
+  const barW = Math.floor((cW - totalGaps) / n);
+
+  // Compute each bar's x offset
+  const xOf = [];
+  let cx = 0;
+  for (let i = 0; i < n; i++) {
+    xOf.push(cx);
+    if (i < n - 1) {
+      cx += barW + (rows[i].outlet !== rows[i + 1].outlet ? interGap : intraGap);
+    }
+  }
+
+  // Y axis: 0 – 120%
+  const yMax = 120;
+  const yScale = pct => pT + cH - (Math.min(pct, yMax) / yMax) * cH;
+  const gridPcts = [0, 25, 50, 75, 90, 100];
+
+  // ── Build SVG ──
+  let g = '';
+
+  // Gridlines + y-axis labels
+  for (const p of gridPcts) {
+    const y = yScale(p).toFixed(1);
+    const is90  = p === THRESHOLD;
+    const is100 = p === 100;
+    const col   = is90 ? 'var(--danger)' : 'var(--border)';
+    const sw    = is90 ? 1.5 : 1;
+    const dash  = is90 ? '5 3' : '';
+    const op    = is90 ? 0.6 : is100 ? 0.5 : 0.4;
+    g += `<line x1="${pL}" y1="${y}" x2="${pL + cW}" y2="${y}" stroke="${col}" stroke-width="${sw}" stroke-dasharray="${dash}" opacity="${op}"/>`;
+    g += `<text x="${pL - 6}" y="${(+y + 3.5).toFixed(1)}" text-anchor="end" font-size="10" fill="${is90 ? 'var(--danger)' : 'var(--text-3)'}" font-weight="${is90 ? '600' : '400'}">${p}%</text>`;
+  }
+
+  // Bars + labels
+  for (let i = 0; i < n; i++) {
+    const row = rows[i];
+    const pct = row.sales / row.target * 100;
+    const bx  = (pL + xOf[i]).toFixed(1);
+    const bH  = Math.max(2, (Math.min(pct, yMax) / yMax) * cH);
+    const by  = (pT + cH - bH).toFixed(1);
+    const bHf = bH.toFixed(1);
+    const below = pct < THRESHOLD;
+    const fill  = below ? 'var(--danger)' : 'var(--accent)';
+
+    g += `<rect x="${bx}" y="${by}" width="${barW}" height="${bHf}" fill="${fill}" rx="3" opacity="${below ? 1 : 0.85}"/>`;
+
+    // Pct label above bar
+    const lx = (pL + xOf[i] + barW / 2).toFixed(1);
+    const ly = (pT + cH - bH - 5).toFixed(1);
+    g += `<text x="${lx}" y="${ly}" text-anchor="middle" font-size="10" font-weight="500" fill="${below ? 'var(--danger)' : 'var(--text-2)'}">${pct.toFixed(0)}%</text>`;
+
+    // Week label
+    const wx = lx;
+    const wy = (pT + cH + 14).toFixed(1);
+    g += `<text x="${wx}" y="${wy}" text-anchor="middle" font-size="10" fill="var(--text-3)">${fmtWeekShort(row.week)}</text>`;
+  }
+
+  // Outlet group labels (All view only)
+  if (activeOutlet === 'All') {
+    for (const outlet of outlets) {
+      const group = rows.map((r, i) => ({ r, i })).filter(({ r }) => r.outlet === outlet);
+      if (!group.length) continue;
+      const gx1 = pL + xOf[group[0].i];
+      const gx2 = pL + xOf[group[group.length - 1].i] + barW;
+      const gxc = ((gx1 + gx2) / 2).toFixed(1);
+      const gy  = (pT + cH + 32).toFixed(1);
+      g += `<text x="${gxc}" y="${gy}" text-anchor="middle" font-size="11" font-weight="600" fill="var(--text)">${outlet}</text>`;
+    }
+  }
+
+  container.innerHTML = `
+    <svg viewBox="0 0 ${W} ${H}" aria-label="Bar chart: sales as % of target">
+      <g font-family="'DM Sans',system-ui,sans-serif">${g}</g>
+    </svg>`;
+}
+
+// ─── Attention list ──────────────────────────────────────────────
+function renderAttention(data) {
+  const list = document.getElementById('attn-list');
+  const under = data
+    .map(r => ({ ...r, pct: r.sales / r.target * 100, gap: r.target - r.sales }))
+    .filter(r => r.pct < THRESHOLD)
+    .sort((a, b) => a.pct - b.pct);
+
+  if (!under.length) {
+    list.innerHTML = `<li class="empty-state">All outlet-weeks are at or above 90% of target.</li>`;
+    return;
+  }
+
+  list.innerHTML = under.map(r => `
+    <li class="attn-item">
+      <span class="attn-outlet">${r.outlet}</span>
+      <span class="attn-week">Wk ${fmtWeekShort(r.week)}</span>
+      <span class="attn-gap">${fmtMoney(r.gap)} short</span>
+      <span class="attn-badge">${fmtPct(r.pct)}</span>
+    </li>`).join('');
+}
+
+// ─── Main ───────────────────────────────────────────────────────
+function render() {
+  const data = getFiltered();
+  renderKPIs(data);
+  renderChart(data);
+  renderAttention(data);
+}
+
+async function init() {
+  ALL_DATA = await loadData();
+
+  document.getElementById('filter-tabs').addEventListener('click', e => {
+    const btn = e.target.closest('.filter-btn');
+    if (!btn) return;
+    activeOutlet = btn.dataset.outlet;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b === btn));
+    render();
+  });
+
+  render();
+}
+
+init();
+</script>
