@@ -102,6 +102,30 @@ body {
   letter-spacing: 0.01em;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ── Log button ── */
+.btn-log {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 7px 16px;
+  border: none;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  transition: opacity 0.14s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.btn-log:hover { opacity: 0.88; }
+
 /* ── Filter ── */
 .filter {
   display: flex;
@@ -232,9 +256,7 @@ body {
 }
 
 /* ── Attention list ── */
-.attn-list {
-  list-style: none;
-}
+.attn-list { list-style: none; }
 .attn-item {
   display: flex;
   align-items: center;
@@ -279,19 +301,176 @@ body {
   color: var(--text-3);
   font-size: 13px;
 }
+
+/* ── Modal overlay ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s;
+}
+.modal-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  transform: translateY(10px);
+  transition: transform 0.18s;
+}
+.modal-overlay.open .modal {
+  transform: translateY(0);
+}
+
+.modal-head {
+  padding: 20px 22px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.modal-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+.modal-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-3);
+  font-size: 20px;
+  line-height: 1;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: color 0.12s;
+}
+.modal-close:hover { color: var(--text); }
+
+.modal-body {
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.field label {
+  font-size: 11.5px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-3);
+}
+.field input,
+.field select {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 8px 11px;
+  outline: none;
+  transition: border-color 0.14s;
+  width: 100%;
+  font-variant-numeric: tabular-nums;
+}
+.field input:focus,
+.field select:focus {
+  border-color: var(--accent);
+}
+.field select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239E9A94' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 11px center;
+  padding-right: 30px;
+  cursor: pointer;
+}
+
+.modal-foot {
+  padding: 0 22px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.form-error {
+  font-size: 12px;
+  color: var(--danger);
+  flex: 1;
+  min-width: 0;
+}
+.btn-cancel {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 7px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: background 0.14s, color 0.14s;
+  white-space: nowrap;
+}
+.btn-cancel:hover { background: var(--surface-2); color: var(--text); }
+.btn-submit {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 7px 20px;
+  border: none;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+  transition: opacity 0.14s;
+  white-space: nowrap;
+}
+.btn-submit:hover { opacity: 0.88; }
+.btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
 </style>
 
 <!-- Header -->
 <div class="header">
   <div class="header-copy">
     <h1>Outlet Performance</h1>
-    <p id="period-label">Sep 7 – Sep 21, 2026 &nbsp;·&nbsp; 3 outlets &nbsp;·&nbsp; 3 weeks</p>
+    <p id="period-label">Loading...</p>
   </div>
-  <div class="filter" role="group" aria-label="Filter by outlet" id="filter-tabs">
-    <button class="filter-btn active" data-outlet="All">All</button>
-    <button class="filter-btn" data-outlet="Tampines">Tampines</button>
-    <button class="filter-btn" data-outlet="Jurong">Jurong</button>
-    <button class="filter-btn" data-outlet="Orchard">Orchard</button>
+  <div class="header-actions">
+    <button class="btn-log" id="btn-open-log">+ Log week</button>
+    <div class="filter" role="group" aria-label="Filter by outlet" id="filter-tabs">
+      <button class="filter-btn active" data-outlet="All">All</button>
+      <button class="filter-btn" data-outlet="Tampines">Tampines</button>
+      <button class="filter-btn" data-outlet="Jurong">Jurong</button>
+      <button class="filter-btn" data-outlet="Orchard">Orchard</button>
+    </div>
   </div>
 </div>
 
@@ -323,6 +502,57 @@ body {
   <ul class="attn-list" id="attn-list"></ul>
 </div>
 
+<!-- Log week modal -->
+<div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true" aria-label="Log week data">
+  <div class="modal">
+    <div class="modal-head">
+      <span class="modal-title">Log week</span>
+      <button class="modal-close" id="btn-close-modal" aria-label="Close">&#215;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="field">
+          <label for="f-outlet">Outlet</label>
+          <select id="f-outlet">
+            <option value="Tampines">Tampines</option>
+            <option value="Jurong">Jurong</option>
+            <option value="Orchard">Orchard</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="f-week">Week starting</label>
+          <input type="date" id="f-week">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label for="f-sales">Sales ($)</label>
+          <input type="number" id="f-sales" min="0" placeholder="0">
+        </div>
+        <div class="field">
+          <label for="f-target">Target ($)</label>
+          <input type="number" id="f-target" min="0" placeholder="0">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label for="f-orders">Orders</label>
+          <input type="number" id="f-orders" min="0" placeholder="0">
+        </div>
+        <div class="field">
+          <label for="f-returns">Returns</label>
+          <input type="number" id="f-returns" min="0" placeholder="0">
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <span class="form-error" id="form-error"></span>
+      <button class="btn-cancel" id="btn-cancel-modal">Cancel</button>
+      <button class="btn-submit" id="btn-submit-form">Save</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ═══════════════════════════════════════════════════════════════
 //  DATA LAYER — Supabase
@@ -341,6 +571,11 @@ async function loadData() {
   return data;
 }
 
+async function insertRow(row) {
+  const { error } = await db.from('outlet_performance').insert(row);
+  if (error) throw error;
+}
+
 // ─── State ──────────────────────────────────────────────────────
 let ALL_DATA = [];
 let activeOutlet = 'All';
@@ -353,11 +588,22 @@ function fmtMoney(n) {
   if (n >= 1000) return '$' + (n / 1000).toFixed(1) + 'k';
   return '$' + n.toLocaleString();
 }
-function fmtPct(n) { return n.toFixed(1) + '%'; }
-function fmtNum(n) { return n.toLocaleString(); }
+function fmtPct(n)      { return n.toFixed(1) + '%'; }
+function fmtNum(n)      { return n.toLocaleString(); }
 function fmtWeekShort(w) {
   const d = new Date(w + 'T00:00:00');
   return d.toLocaleDateString('en-SG', { month: 'short', day: 'numeric' });
+}
+
+// ─── Period label ────────────────────────────────────────────────
+function updatePeriodLabel() {
+  if (!ALL_DATA.length) { document.getElementById('period-label').textContent = ''; return; }
+  const weeks  = [...new Set(ALL_DATA.map(r => r.week))].sort();
+  const outlets = [...new Set(ALL_DATA.map(r => r.outlet))];
+  const from = fmtWeekShort(weeks[0]);
+  const to   = fmtWeekShort(weeks[weeks.length - 1]);
+  document.getElementById('period-label').innerHTML =
+    `${from} – ${to} &nbsp;·&nbsp; ${outlets.length} outlet${outlets.length !== 1 ? 's' : ''} &nbsp;·&nbsp; ${weeks.length} week${weeks.length !== 1 ? 's' : ''}`;
 }
 
 // ─── Filter ─────────────────────────────────────────────────────
@@ -368,6 +614,10 @@ function getFiltered() {
 
 // ─── KPI render ─────────────────────────────────────────────────
 function renderKPIs(data) {
+  if (!data.length) {
+    document.getElementById('kpi-row').innerHTML = '';
+    return;
+  }
   const totSales   = data.reduce((s, r) => s + r.sales, 0);
   const totTarget  = data.reduce((s, r) => s + r.target, 0);
   const totOrders  = data.reduce((s, r) => s + r.orders, 0);
@@ -375,8 +625,8 @@ function renderKPIs(data) {
   const pctTgt     = totTarget ? totSales / totTarget * 100 : 0;
   const retRate    = totOrders ? totReturns / totOrders * 100 : 0;
 
-  const pctClass   = pctTgt >= 100 ? 'ok' : pctTgt >= THRESHOLD ? 'warn' : 'danger';
-  const retClass   = retRate > 3.5 ? 'danger' : retRate > 2.5 ? 'warn' : '';
+  const pctClass = pctTgt >= 100 ? 'ok' : pctTgt >= THRESHOLD ? 'warn' : 'danger';
+  const retClass = retRate > 3.5 ? 'danger' : retRate > 2.5 ? 'warn' : '';
 
   document.getElementById('kpi-row').innerHTML = `
     <div class="kpi-card">
@@ -407,7 +657,6 @@ function renderChart(data) {
   const container = document.getElementById('chart-container');
   if (!data.length) { container.innerHTML = '<p class="empty-state">No data for selection.</p>'; return; }
 
-  // Sort by outlet order then week
   const rows = [...data].sort((a, b) => {
     const oi = OUTLET_ORDER.indexOf(a.outlet) - OUTLET_ORDER.indexOf(b.outlet);
     return oi !== 0 ? oi : a.week.localeCompare(b.week);
@@ -419,79 +668,60 @@ function renderChart(data) {
   const cW = W - pL - pR;
   const cH = H - pT - pB;
 
-  // Layout: bars with group gaps
-  const outlets = [...new Set(rows.map(r => r.outlet))]; // ordered
-  const nGroups = outlets.length;
+  const outlets  = [...new Set(rows.map(r => r.outlet))];
+  const nGroups  = outlets.length;
   const intraGap = 7;
   const interGap = nGroups > 1 ? 22 : 0;
   const totalGaps = intraGap * (n - nGroups) + interGap * (nGroups - 1);
   const barW = Math.floor((cW - totalGaps) / n);
 
-  // Compute each bar's x offset
   const xOf = [];
   let cx = 0;
   for (let i = 0; i < n; i++) {
     xOf.push(cx);
-    if (i < n - 1) {
+    if (i < n - 1)
       cx += barW + (rows[i].outlet !== rows[i + 1].outlet ? interGap : intraGap);
-    }
   }
 
-  // Y axis: 0 – 120%
   const yMax = 120;
   const yScale = pct => pT + cH - (Math.min(pct, yMax) / yMax) * cH;
   const gridPcts = [0, 25, 50, 75, 90, 100];
 
-  // ── Build SVG ──
   let g = '';
 
-  // Gridlines + y-axis labels
   for (const p of gridPcts) {
-    const y = yScale(p).toFixed(1);
+    const y    = yScale(p).toFixed(1);
     const is90  = p === THRESHOLD;
-    const is100 = p === 100;
     const col   = is90 ? 'var(--danger)' : 'var(--border)';
     const sw    = is90 ? 1.5 : 1;
     const dash  = is90 ? '5 3' : '';
-    const op    = is90 ? 0.6 : is100 ? 0.5 : 0.4;
+    const op    = is90 ? 0.6 : p === 100 ? 0.5 : 0.4;
     g += `<line x1="${pL}" y1="${y}" x2="${pL + cW}" y2="${y}" stroke="${col}" stroke-width="${sw}" stroke-dasharray="${dash}" opacity="${op}"/>`;
     g += `<text x="${pL - 6}" y="${(+y + 3.5).toFixed(1)}" text-anchor="end" font-size="10" fill="${is90 ? 'var(--danger)' : 'var(--text-3)'}" font-weight="${is90 ? '600' : '400'}">${p}%</text>`;
   }
 
-  // Bars + labels
   for (let i = 0; i < n; i++) {
-    const row = rows[i];
-    const pct = row.sales / row.target * 100;
-    const bx  = (pL + xOf[i]).toFixed(1);
-    const bH  = Math.max(2, (Math.min(pct, yMax) / yMax) * cH);
-    const by  = (pT + cH - bH).toFixed(1);
-    const bHf = bH.toFixed(1);
+    const row   = rows[i];
+    const pct   = row.sales / row.target * 100;
+    const bx    = (pL + xOf[i]).toFixed(1);
+    const bH    = Math.max(2, (Math.min(pct, yMax) / yMax) * cH);
+    const by    = (pT + cH - bH).toFixed(1);
     const below = pct < THRESHOLD;
     const fill  = below ? 'var(--danger)' : 'var(--accent)';
+    const lx    = (pL + xOf[i] + barW / 2).toFixed(1);
 
-    g += `<rect x="${bx}" y="${by}" width="${barW}" height="${bHf}" fill="${fill}" rx="3" opacity="${below ? 1 : 0.85}"/>`;
-
-    // Pct label above bar
-    const lx = (pL + xOf[i] + barW / 2).toFixed(1);
-    const ly = (pT + cH - bH - 5).toFixed(1);
-    g += `<text x="${lx}" y="${ly}" text-anchor="middle" font-size="10" font-weight="500" fill="${below ? 'var(--danger)' : 'var(--text-2)'}">${pct.toFixed(0)}%</text>`;
-
-    // Week label
-    const wx = lx;
-    const wy = (pT + cH + 14).toFixed(1);
-    g += `<text x="${wx}" y="${wy}" text-anchor="middle" font-size="10" fill="var(--text-3)">${fmtWeekShort(row.week)}</text>`;
+    g += `<rect x="${bx}" y="${by}" width="${barW}" height="${bH.toFixed(1)}" fill="${fill}" rx="3" opacity="${below ? 1 : 0.85}"/>`;
+    g += `<text x="${lx}" y="${(pT + cH - bH - 5).toFixed(1)}" text-anchor="middle" font-size="10" font-weight="500" fill="${below ? 'var(--danger)' : 'var(--text-2)'}">${pct.toFixed(0)}%</text>`;
+    g += `<text x="${lx}" y="${(pT + cH + 14).toFixed(1)}" text-anchor="middle" font-size="10" fill="var(--text-3)">${fmtWeekShort(row.week)}</text>`;
   }
 
-  // Outlet group labels (All view only)
   if (activeOutlet === 'All') {
     for (const outlet of outlets) {
       const group = rows.map((r, i) => ({ r, i })).filter(({ r }) => r.outlet === outlet);
       if (!group.length) continue;
       const gx1 = pL + xOf[group[0].i];
       const gx2 = pL + xOf[group[group.length - 1].i] + barW;
-      const gxc = ((gx1 + gx2) / 2).toFixed(1);
-      const gy  = (pT + cH + 32).toFixed(1);
-      g += `<text x="${gxc}" y="${gy}" text-anchor="middle" font-size="11" font-weight="600" fill="var(--text)">${outlet}</text>`;
+      g += `<text x="${((gx1 + gx2) / 2).toFixed(1)}" y="${(pT + cH + 32).toFixed(1)}" text-anchor="middle" font-size="11" font-weight="600" fill="var(--text)">${outlet}</text>`;
     }
   }
 
@@ -523,7 +753,7 @@ function renderAttention(data) {
     </li>`).join('');
 }
 
-// ─── Main ───────────────────────────────────────────────────────
+// ─── Render all ─────────────────────────────────────────────────
 function render() {
   const data = getFiltered();
   renderKPIs(data);
@@ -531,8 +761,70 @@ function render() {
   renderAttention(data);
 }
 
+// ─── Modal ──────────────────────────────────────────────────────
+function openModal() {
+  // Default week to the most recent Monday
+  const today = new Date();
+  const day = today.getDay();
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - (day === 0 ? 6 : day - 1));
+  document.getElementById('f-week').value = monday.toISOString().slice(0, 10);
+  document.getElementById('form-error').textContent = '';
+  document.getElementById('btn-submit-form').disabled = false;
+  document.getElementById('modal-overlay').classList.add('open');
+  document.getElementById('f-outlet').focus();
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+
+async function submitForm() {
+  const outlet  = document.getElementById('f-outlet').value;
+  const week    = document.getElementById('f-week').value;
+  const sales   = parseInt(document.getElementById('f-sales').value, 10);
+  const target  = parseInt(document.getElementById('f-target').value, 10);
+  const orders  = parseInt(document.getElementById('f-orders').value, 10);
+  const returns = parseInt(document.getElementById('f-returns').value, 10);
+  const errEl   = document.getElementById('form-error');
+
+  if (!week || isNaN(sales) || isNaN(target) || isNaN(orders) || isNaN(returns)) {
+    errEl.textContent = 'All fields are required.';
+    return;
+  }
+  if (sales < 0 || target <= 0 || orders < 0 || returns < 0) {
+    errEl.textContent = 'Values must be positive.';
+    return;
+  }
+
+  const btn = document.getElementById('btn-submit-form');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+  errEl.textContent = '';
+
+  try {
+    await insertRow({ outlet, week, sales, target, orders, returns });
+    ALL_DATA = await loadData();
+    updatePeriodLabel();
+    render();
+    closeModal();
+    // Clear fields for next use
+    ['f-sales', 'f-target', 'f-orders', 'f-returns'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+  } catch (err) {
+    const msg = err.message || '';
+    errEl.textContent = msg.includes('unique') ? 'A record for this outlet and week already exists.' : 'Save failed. Try again.';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Save';
+  }
+}
+
+// ─── Init ───────────────────────────────────────────────────────
 async function init() {
   ALL_DATA = await loadData();
+  updatePeriodLabel();
 
   document.getElementById('filter-tabs').addEventListener('click', e => {
     const btn = e.target.closest('.filter-btn');
@@ -540,6 +832,17 @@ async function init() {
     activeOutlet = btn.dataset.outlet;
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b === btn));
     render();
+  });
+
+  document.getElementById('btn-open-log').addEventListener('click', openModal);
+  document.getElementById('btn-close-modal').addEventListener('click', closeModal);
+  document.getElementById('btn-cancel-modal').addEventListener('click', closeModal);
+  document.getElementById('btn-submit-form').addEventListener('click', submitForm);
+  document.getElementById('modal-overlay').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeModal();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal();
   });
 
   render();
